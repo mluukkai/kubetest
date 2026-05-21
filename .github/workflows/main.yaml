@@ -32,7 +32,14 @@ jobs:
       - name: "Use gcloud CLI"
         run: gcloud info
 
-      - run: gcloud --quiet auth configure-docker
+      - name: Configure Docker for Artifact Registry
+        run: gcloud --quiet auth configure-docker $REGISTRY
+
+      - name: Verify Artifact Registry access with gcloud
+        run: |
+          AR_LOCATION="${REGISTRY%-docker.pkg.dev}"
+          gcloud auth list
+          gcloud artifacts repositories describe "$REPOSITORY" --location "$AR_LOCATION" --project "$PROJECT_ID"
 
       - name: "Get GKE credentials"
         uses: "google-github-actions/get-gke-credentials@v3"
